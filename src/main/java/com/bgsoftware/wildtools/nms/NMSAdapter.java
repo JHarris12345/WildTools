@@ -1,5 +1,6 @@
 package com.bgsoftware.wildtools.nms;
 
+import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.wildtools.recipes.AdvancedShapedRecipe;
 import com.bgsoftware.wildtools.utils.items.ToolItemStack;
 import org.apache.commons.lang.Validate;
@@ -20,7 +21,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
 import org.bukkit.inventory.ShapedRecipe;
 
-import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -28,11 +28,9 @@ import java.util.Set;
 
 public interface NMSAdapter {
 
-    boolean isMappingsSupported();
-
     String getVersion();
 
-    default boolean isLegacy(){
+    default boolean isLegacy() {
         return true;
     }
 
@@ -70,7 +68,7 @@ public interface NMSAdapter {
 
     void refreshChunk(Chunk chunk, Set<Location> blocksList);
 
-    int getCombinedId(Location location);
+    int getCombinedId(Block block);
 
     int getFarmlandId();
 
@@ -80,7 +78,7 @@ public interface NMSAdapter {
 
     boolean isOutsideWorldborder(Location location);
 
-    BlockPlaceEvent getFakePlaceEvent(Player player, Location location, Block copyBlock);
+    BlockPlaceEvent getFakePlaceEvent(Player player, Block block, Block copyBlock);
 
     void playPickupAnimation(LivingEntity livingEntity, Item item);
 
@@ -88,23 +86,23 @@ public interface NMSAdapter {
 
     boolean isShovelType(Material material);
 
-    default ItemStack[] parseChoice(Recipe recipe, ItemStack itemStack){
-        return new ItemStack[] {itemStack};
+    default ItemStack[] parseChoice(Recipe recipe, ItemStack itemStack) {
+        return new ItemStack[]{itemStack};
     }
 
-    default void setExpCost(InventoryView inventoryView, int expCost){
+    default void setExpCost(InventoryView inventoryView, int expCost) {
 
     }
 
-    default int getExpCost(InventoryView inventoryView){
+    default int getExpCost(InventoryView inventoryView) {
         return 0;
     }
 
-    default String getRenameText(InventoryView inventoryView){
+    default String getRenameText(InventoryView inventoryView) {
         return "";
     }
 
-    default AdvancedShapedRecipe createRecipe(String toolName, ItemStack result){
+    default AdvancedShapedRecipe createRecipe(String toolName, ItemStack result) {
         return new AdvancedRecipeClassImpl(result);
     }
 
@@ -118,20 +116,12 @@ public interface NMSAdapter {
 
     class AdvancedRecipeClassImpl extends ShapedRecipe implements AdvancedShapedRecipe {
 
-        private static Field ingredientsField;
-
-        static {
-            try{
-                ingredientsField = ShapedRecipe.class.getDeclaredField("ingredients");
-                ingredientsField.setAccessible(true);
-            }catch(Exception ex){
-                ex.printStackTrace();
-            }
-        }
+        private static final ReflectField<Map<Character, ItemStack>> INGREDIENTS_FIELD = new ReflectField<>(
+                ShapedRecipe.class, Map.class, "ingredients");
 
         private Map<Character, ItemStack> ingredients;
 
-        public AdvancedRecipeClassImpl(org.bukkit.inventory.ItemStack result){
+        public AdvancedRecipeClassImpl(org.bukkit.inventory.ItemStack result) {
             super(result);
             updateIngredients();
         }
@@ -155,13 +145,8 @@ public interface NMSAdapter {
             return this;
         }
 
-        private void updateIngredients(){
-            try{
-                //noinspection unchecked
-                ingredients = (Map<Character, org.bukkit.inventory.ItemStack>) ingredientsField.get(this);
-            }catch(Exception ex){
-                throw new RuntimeException(ex);
-            }
+        private void updateIngredients() {
+            ingredients = INGREDIENTS_FIELD.get(this);
         }
 
     }

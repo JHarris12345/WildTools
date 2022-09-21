@@ -5,7 +5,7 @@ plugins {
 }
 
 group 'WildTools'
-version = "2.13.1"
+version = "2022.7"
 
 allprojects {
     apply plugin: 'java'
@@ -35,7 +35,17 @@ allprojects {
         compileOnly "com.bgsoftware.common.reflection:ReflectionUtils:latest"
     }
 
+    task checkDebug() {
+        Set<File> filesWithDebug = fileTree('src/main/java').filter { file ->
+            file.text.contains('Bukkit.broadcastMessage')
+        }.getFiles()
+
+        if(!filesWithDebug.isEmpty())
+            throw new GradleException("Found debug messages: " + filesWithDebug)
+    }
+
     build {
+        dependsOn checkDebug
         dependsOn shadowJar
     }
 }
@@ -68,8 +78,8 @@ jar {
 }
 
 processResources {
-    outputs.upToDateWhen {false}
-    String versionNumber = System.getenv("BUILD_NUMBER") == null ? version : version + "." + System.getenv("BUILD_NUMBER")
+    outputs.upToDateWhen { false }
+    String versionNumber = System.getenv("BUILD_NUMBER") == null ? version : version + "-b" + System.getenv("BUILD_NUMBER")
     eachFile { details ->
         if (details.name.contentEquals('plugin.yml')) {
             filter { String line ->
@@ -82,16 +92,17 @@ processResources {
 shadowJar {
     dependsOn(jar)
 
-    if(System.getenv("BUILD_NUMBER") == null){
+    if (System.getenv("BUILD_NUMBER") == null) {
         archiveName = rootProject.name + "-" + version + ".jar"
-    }
-    else{
+    } else {
         archiveName = rootProject.name + "-" + version + "-b" + System.getenv("BUILD_NUMBER") + ".jar"
     }
 
     delete fileTree('./target/') {
         exclude archiveName
     }
+
+    exclude '*exclude.jar'
 
     destinationDir = file("./target/")
     from sourceSets.getByName("main").output
