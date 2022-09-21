@@ -12,7 +12,9 @@ import com.bgsoftware.wildtools.command.ICommand;
 
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -92,6 +94,10 @@ public final class CommandGive implements ICommand {
             if(uses > -1)
                 toolItem.setUses(uses);
 
+            ItemMeta toolMeta = toolItem.getItemMeta();
+            toolMeta.setDisplayName(ItemUtils.translateColourCodes(tool.getItemStack().getItemMeta().getDisplayName()));
+
+            toolItem.setItemMeta(toolMeta);
             ItemUtils.addItem(toolItem.getItem(), pl.getInventory(), pl.getLocation(), itemsDropper);
         }
 

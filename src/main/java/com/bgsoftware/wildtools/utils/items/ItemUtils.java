@@ -4,10 +4,7 @@ import com.bgsoftware.wildtools.Locale;
 import com.bgsoftware.wildtools.objects.WMaterial;
 import com.bgsoftware.wildtools.objects.tools.WHarvesterTool;
 import com.bgsoftware.wildtools.utils.Executor;
-import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
-import org.bukkit.Location;
-import org.bukkit.Material;
+import org.bukkit.*;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -21,6 +18,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public final class ItemUtils {
 
@@ -42,6 +41,19 @@ public final class ItemUtils {
                 }
             });
         }
+    }
+
+    public static String translateColourCodes(String string) {
+        Pattern pattern = Pattern.compile("#[A-Fa-f0-9]{6}");
+        Matcher matcher = pattern.matcher(string);
+        String output = ChatColor.translateAlternateColorCodes('&', string);
+
+        while (matcher.find()) {
+            String color = string.substring(matcher.start(), matcher.end());
+            output = output.replace(color, "" + net.md_5.bungee.api.ChatColor.of(color));
+        }
+
+        return output;
     }
 
     public static void formatItemStack(ToolItemStack toolItemStack){

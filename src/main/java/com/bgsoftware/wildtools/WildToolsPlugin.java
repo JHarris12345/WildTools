@@ -109,10 +109,10 @@ public final class WildToolsPlugin extends JavaPlugin implements WildTools {
         try {
             nmsAdapter = (NMSAdapter) Class.forName(String.format("com.bgsoftware.wildtools.nms.%s.NMSAdapter", version)).newInstance();
 
-            if(!nmsAdapter.isMappingsSupported()) {
+            /*if(!nmsAdapter.isMappingsSupported()) {
                 log("Error while loading adapter - your version mappings are not supported... Please contact @Ome_R");
                 return false;
-            }
+            }*/
         } catch (ClassNotFoundException | IllegalAccessException | InstantiationException e) {
             getLogger().info("Error while loading adapter - unknown adapter " + version + "... Please contact @Ome_R");
             return false;

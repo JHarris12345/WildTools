@@ -74,7 +74,7 @@ public final class ItemBuilder {
 
     public ItemBuilder withName(String name){
         if(!name.isEmpty())
-            itemMeta.setDisplayName(ChatColor.translateAlternateColorCodes('&', name));
+            itemMeta.setDisplayName(ItemUtils.translateColourCodes(name));
         return this;
     }
 
