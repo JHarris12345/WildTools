@@ -55,10 +55,13 @@ allprojects {
 
 repositories {
     mavenCentral()
+    maven { url 'https://repo.extendedclip.com/releases/' }
 }
 
 dependencies {
     implementation project(":API")
+
+    compileOnly 'me.clip:placeholderapi:2.11.6'
 
     implementation 'com.bgsoftware.common.reflection:ReflectionUtils:b8'
     implementation 'com.bgsoftware.common.updater:Updater:b1'
