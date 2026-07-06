@@ -5,6 +5,12 @@ pluginManagement {
     }
 }
 
+plugins {
+    // Auto-provisions the various Java toolchains (8/16/17/21/...) the NMS +
+    // hook modules require, so a single installed JDK is enough to build
+    id 'org.gradle.toolchains.foojay-resolver-convention' version '1.0.0'
+}
+
 rootProject.name = 'WildTools'
 
 include 'API'
