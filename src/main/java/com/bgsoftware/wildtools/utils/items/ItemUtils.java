@@ -13,6 +13,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import me.clip.placeholderapi.PlaceholderAPI;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -25,6 +26,30 @@ import java.util.UUID;
 public class ItemUtils {
 
     private static final WildToolsPlugin plugin = WildToolsPlugin.getPlugin();
+
+    private static final boolean PLACEHOLDER_API =
+            Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null;
+
+    // Resolves PlaceholderAPI placeholders in the item's lore for the given player.
+    // Called once, at the moment a tool is spawned/given, so each placeholder is
+    // translated a single time against fresh values (not baked in at config load).
+    // No-op when PlaceholderAPI isn't installed, so it stays a soft dependency.
+    public static void translateLorePlaceholders(ItemStack itemStack, Player player) {
+        if (!PLACEHOLDER_API || itemStack == null || player == null)
+            return;
+
+        ItemMeta itemMeta = itemStack.getItemMeta();
+        if (itemMeta == null || !itemMeta.hasLore())
+            return;
+
+        List<String> lore = itemMeta.getLore();
+        List<String> translated = new ArrayList<>(lore.size());
+        for (String line : lore)
+            translated.add(PlaceholderAPI.setPlaceholders(player, line));
+
+        itemMeta.setLore(translated);
+        itemStack.setItemMeta(itemMeta);
+    }
 
     public static void addItem(ItemStack itemStack, Inventory inventory, Location location, @Nullable WorldEditSession editSession) {
         HashMap<Integer, ItemStack> additionalItems = inventory.addItem(itemStack);

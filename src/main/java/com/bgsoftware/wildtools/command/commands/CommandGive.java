@@ -88,6 +88,10 @@ public class CommandGive implements ICommand {
             if (uses > -1)
                 toolItem.setUses(uses);
 
+            // Translate PlaceholderAPI placeholders in the lore at spawn time, once per
+            // tool given, resolved against the receiving player
+            ItemUtils.translateLorePlaceholders(toolItem.getItem(), player);
+
             ItemUtils.addItem(toolItem.getItem(), player.getInventory(), player.getLocation(), null);
         }
 
