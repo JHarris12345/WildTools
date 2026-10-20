@@ -18,6 +18,7 @@ import com.bgsoftware.wildtools.handlers.RecipesHandler;
 import com.bgsoftware.wildtools.handlers.ToolsHandler;
 import com.bgsoftware.wildtools.listeners.AnvilListener;
 import com.bgsoftware.wildtools.listeners.BlocksListener;
+import com.bgsoftware.wildtools.listeners.CraftingListener;
 import com.bgsoftware.wildtools.listeners.EditorListener;
 import com.bgsoftware.wildtools.listeners.PlayerListener;
 import com.bgsoftware.wildtools.nms.NMSAdapter;
@@ -76,6 +77,7 @@ public class WildToolsPlugin extends JavaPlugin implements WildTools {
         } catch (Exception ignored) {
         }
         getServer().getPluginManager().registerEvents(new BlocksListener(this), this);
+        getServer().getPluginManager().registerEvents(new CraftingListener(this), this);
         getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
         getServer().getPluginManager().registerEvents(new EditorListener(this), this);
 
